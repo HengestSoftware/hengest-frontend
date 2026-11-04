@@ -1,0 +1,164 @@
+/**
+ * Utilidades de Efecto Cristal ("Cascarón de Cristal") para HENGEST
+ * Superficies translúcidas, reflejos sutiles y orbes orgánicos de fondo.
+ */
+
+/* Superficie de cristal base */
+.glass-panel {
+  background-color: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 0 var(--glass-highlight), var(--glass-shadow);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+/* Superficie de cristal elevada (para tarjetas interactivas o flotantes) */
+.glass-panel-elevated {
+  background-color: var(--bg-surface-elevated);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--glass-border-strong);
+  box-shadow: inset 0 1px 0 0 var(--glass-highlight), var(--glass-shadow-lg);
+}
+
+/* Barra de navegación de cristal fija */
+.glass-navbar {
+  background-color: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.04);
+}
+
+html.dark .glass-navbar {
+  box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.6);
+}
+
+/* Pastilla de cristal para badges, etiquetas o logo */
+.glass-pill {
+  background-color: var(--bg-pill);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 0 var(--glass-highlight);
+}
+
+/* Respaldo para navegadores móviles antiguos sin soporte de backdrop-filter */
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .glass-panel {
+    background-color: var(--bg-surface-solid);
+  }
+  .glass-panel-elevated {
+    background-color: var(--bg-surface-solid);
+  }
+  .glass-navbar {
+    background-color: var(--bg-surface-solid);
+  }
+  .glass-pill {
+    background-color: var(--bg-surface-solid);
+  }
+}
+
+/* ==========================================================================
+   Fondo con profundidad: Orbes en forma de huevo
+   Mueven lentamente detrás del cristal animando solo transform y opacity
+   ========================================================================== */
+
+.ambient-background {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.egg-orb {
+  position: absolute;
+  border-radius: var(--radius-egg);
+  filter: blur(70px);
+  will-change: transform, opacity;
+}
+
+.egg-orb-1 {
+  top: -10%;
+  left: 10%;
+  width: 520px;
+  height: 640px;
+  background: radial-gradient(circle, var(--orb-green-1) 0%, transparent 70%);
+  animation: floatEggOne 24s ease-in-out infinite alternate;
+}
+
+.egg-orb-2 {
+  top: 35%;
+  right: -5%;
+  width: 560px;
+  height: 700px;
+  background: radial-gradient(circle, var(--orb-lime-1) 0%, transparent 68%);
+  animation: floatEggTwo 28s ease-in-out infinite alternate;
+}
+
+.egg-orb-3 {
+  bottom: -15%;
+  left: 20%;
+  width: 600px;
+  height: 720px;
+  background: radial-gradient(circle, var(--orb-green-2) 0%, transparent 70%);
+  animation: floatEggThree 32s ease-in-out infinite alternate;
+}
+
+@keyframes floatEggOne {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translate(40px, 60px) rotate(8deg) scale(1.08);
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(-30px, 90px) rotate(-6deg) scale(0.96);
+    opacity: 0.75;
+  }
+}
+
+@keyframes floatEggTwo {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translate(-50px, -40px) rotate(-10deg) scale(1.1);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(30px, -70px) rotate(6deg) scale(0.94);
+    opacity: 0.65;
+  }
+}
+
+@keyframes floatEggThree {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(0.95);
+    opacity: 0.75;
+  }
+  50% {
+    transform: translate(60px, -30px) rotate(12deg) scale(1.06);
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(-40px, -60px) rotate(-8deg) scale(1);
+    opacity: 0.8;
+  }
+}
+
+/* Respeto estricto a accesibilidad: usuarios con preferencia de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  .egg-orb,
+  .egg-slot-animated,
+  .animate-spin-slow {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+

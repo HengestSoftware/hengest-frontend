@@ -1,0 +1,100 @@
+/**
+ * Variables CSS para HENGEST
+ * Paleta inspirada en el campo, el cascarón de huevo y el galpón tecnificado.
+ * Tema claro: Blancos cálidos de cascarón y verdes follaje.
+ * Tema oscuro: Negro obsidiana profundo con luz esmeralda y lima (verde con negro, sin grises azulados).
+ */
+
+:root {
+  /* ==========================================================================
+     TEMA CLARO (Predeterminado)
+     ========================================================================== */
+  --bg-canvas: #f6f8f5;
+  --bg-surface: rgba(255, 255, 255, 0.78);
+  --bg-surface-elevated: rgba(255, 255, 255, 0.92);
+  --bg-surface-solid: #ffffff;
+  --bg-pill: rgba(236, 253, 245, 0.85);
+
+  /* Texto (Alto contraste verificado >= 4.5:1 para AA) */
+  --text-primary: #0b1f15;       /* Verde bosque muy oscuro, casi negro */
+  --text-secondary: #254b37;     /* Verde follaje medio */
+  --text-muted: #4e725d;         /* Verde salvia suave */
+  --text-inverse: #ffffff;
+
+  /* Acentos de marca */
+  --accent-primary: #059669;     /* Esmeralda vivo */
+  --accent-hover: #047857;       /* Esmeralda profundo */
+  --accent-active: #065f46;
+  --accent-subtle: rgba(5, 150, 105, 0.12);
+  --accent-glow: rgba(16, 185, 129, 0.25);
+
+  --accent-lime: #65a30d;        /* Verde lima cálido para datos y estados */
+  --accent-amber: #d97706;       /* Alertas medias */
+  --accent-rose: #dc2626;        /* Alertas críticas */
+
+  /* Cristal y elevaciones */
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-bg-subtle: rgba(255, 255, 255, 0.45);
+  --glass-border: rgba(5, 150, 105, 0.16);
+  --glass-border-strong: rgba(5, 150, 105, 0.28);
+  --glass-highlight: rgba(255, 255, 255, 0.85);
+  --glass-shadow: 0 10px 30px -10px rgba(7, 35, 22, 0.08), 0 4px 12px -2px rgba(7, 35, 22, 0.04);
+  --glass-shadow-lg: 0 25px 50px -12px rgba(7, 35, 22, 0.14), 0 8px 24px -4px rgba(7, 35, 22, 0.06);
+
+  /* Huevos orgánicos de fondo */
+  --orb-green-1: rgba(52, 211, 153, 0.28);
+  --orb-green-2: rgba(167, 243, 208, 0.42);
+  --orb-lime-1: rgba(190, 242, 100, 0.24);
+
+  /* Radios de curvatura orgánicos */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-pill: 9999px;
+  --radius-egg: 50% 50% 50% 50% / 60% 60% 40% 40%;
+}
+
+/* ==========================================================================
+   TEMA OSCURO
+   Negro obsidiana con luz esmeralda y lima
+   ========================================================================== */
+html.dark {
+  --bg-canvas: #060b08;
+  --bg-surface: rgba(10, 22, 16, 0.72);
+  --bg-surface-elevated: rgba(14, 30, 22, 0.85);
+  --bg-surface-solid: #0d1a13;
+  --bg-pill: rgba(16, 185, 129, 0.14);
+
+  /* Texto */
+  --text-primary: #f0fdf4;       /* Blanco menta claro */
+  --text-secondary: #a7f3d0;     /* Menta pálido */
+  --text-muted: #6ee7b7;         /* Verde salvia claro */
+  --text-inverse: #060b08;
+
+  /* Acentos de marca */
+  --accent-primary: #10b981;     /* Esmeralda brillante */
+  --accent-hover: #34d399;
+  --accent-active: #059669;
+  --accent-subtle: rgba(16, 185, 129, 0.18);
+  --accent-glow: rgba(52, 211, 153, 0.35);
+
+  --accent-lime: #84cc16;
+  --accent-amber: #f59e0b;
+  --accent-rose: #f87171;
+
+  /* Cristal y elevaciones */
+  --glass-bg: rgba(9, 21, 15, 0.70);
+  --glass-bg-subtle: rgba(9, 21, 15, 0.45);
+  --glass-border: rgba(52, 211, 153, 0.20);
+  --glass-border-strong: rgba(52, 211, 153, 0.38);
+  --glass-highlight: rgba(255, 255, 255, 0.12);
+  --glass-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.55), 0 4px 12px -2px rgba(0, 0, 0, 0.4);
+  --glass-shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.75), 0 8px 24px -4px rgba(0, 0, 0, 0.5);
+
+  /* Huevos orgánicos de fondo (luz viva sobre negro) */
+  --orb-green-1: rgba(16, 185, 129, 0.18);
+  --orb-green-2: rgba(5, 150, 105, 0.22);
+  --orb-lime-1: rgba(132, 204, 22, 0.14);
+}
+
