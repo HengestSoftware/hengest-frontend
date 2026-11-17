@@ -4,6 +4,7 @@ import ProblemSection from '../components/ProblemSection.vue'
 import FeaturesSection from '../components/FeaturesSection.vue'
 import HowItWorksSection from '../components/HowItWorksSection.vue'
 import AudienceSection from '../components/AudienceSection.vue'
+import PricingSection from '../components/PricingSection.vue'
 import FaqSection from '../components/FaqSection.vue'
 import FinalCtaSection from '../components/FinalCtaSection.vue'
 </script>
@@ -25,11 +26,13 @@ import FinalCtaSection from '../components/FinalCtaSection.vue'
     <!-- 5. Para quién: avicultor, mayordomo, asesor, asociaciones -->
     <AudienceSection />
 
-    <!-- 6. Preguntas frecuentes: acordeón accesible y límites de alcance -->
+    <!-- 6. Precios y planes ($60.000/mes, trimestral -5%, anual -10% y WhatsApp) -->
+    <PricingSection />
+
+    <!-- 7. Preguntas frecuentes: acordeón accesible y límites de alcance -->
     <FaqSection />
 
-    <!-- 7. Llamado final a la acción -->
+    <!-- 8. Llamado final a la acción -->
     <FinalCtaSection />
   </div>
 </template>
-

@@ -12,6 +12,7 @@ const navLinks = [
   { label: 'Funcionalidades', href: '/#funcionalidades' },
   { label: 'Cómo funciona', href: '/#como-funciona' },
   { label: 'Para quién', href: '/#para-quien' },
+  { label: 'Precios', href: '/#precios' },
   { label: 'Preguntas', href: '/#preguntas' },
 ]
 
@@ -60,19 +61,11 @@ function closeMobileMenu() {
             <ThemeToggle />
 
             <AppButton
-              variant="ghost"
+              variant="primary"
               size="sm"
               to="/login"
             >
-              Iniciar sesión
-            </AppButton>
-
-            <AppButton
-              variant="primary"
-              size="sm"
-              to="/registro"
-            >
-              Registrarse
+              Ingresar
             </AppButton>
           </div>
 
@@ -131,22 +124,13 @@ function closeMobileMenu() {
         </nav>
         <div class="pt-3 border-t border-glass-border flex flex-col gap-2.5">
           <AppButton
-            variant="secondary"
+            variant="primary"
             size="md"
             full-width
             to="/login"
             @click="closeMobileMenu"
           >
-            Iniciar sesión
-          </AppButton>
-          <AppButton
-            variant="primary"
-            size="md"
-            full-width
-            to="/registro"
-            @click="closeMobileMenu"
-          >
-            Registrarse
+            Ingresar a la plataforma
           </AppButton>
         </div>
       </div>
@@ -201,14 +185,14 @@ function closeMobileMenu() {
             </h2>
             <ul class="space-y-2 text-sm text-secondary">
               <li>
-                <RouterLink to="/login" class="hover:text-primary transition-colors">
-                  Iniciar sesión
+                <RouterLink to="/login" class="hover:text-primary transition-colors font-bold text-emerald-700 dark:text-emerald-400">
+                  Ingresar a la plataforma
                 </RouterLink>
               </li>
               <li>
-                <RouterLink to="/registro" class="hover:text-primary transition-colors">
-                  Crear cuenta de granja
-                </RouterLink>
+                <a href="#precios" class="hover:text-primary transition-colors">
+                  Planes y tarifas
+                </a>
               </li>
             </ul>
             <p class="text-xs text-muted pt-2 leading-relaxed">

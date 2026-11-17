@@ -1,74 +1,139 @@
-/**
- * Wrapper liviano sobre la API Fetch nativa para HENGEST.
- * Sin dependencias externas (sin axios).
- */
+import axios from 'axios'
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+// Configuración de base URL
+const rawBase = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const API_BASE_URL = `${rawBase.replace(/\/$/, '')}/api/v1`
 
-/**
- * Realiza una petición HTTP con fetch y procesa la respuesta en JSON.
- * @param {string} endpoint - Ruta relativa del endpoint (ej. '/auth/login')
- * @param {RequestInit} [options={}] - Opciones de fetch (método, cuerpo, cabeceras, etc.)
- * @returns {Promise<any>}
- */
-export async function apiClient(endpoint, options = {}) {
-  const { headers = {}, body, ...customConfig } = options
+export const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 45000, // 45 segundos para tolerar el arranque en frío de Render
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  },
+})
 
-  const config = {
-    method: options.method || (body ? 'POST' : 'GET'),
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      ...headers,
-    },
-    ...customConfig,
-  }
+// Variables reactivas exportadas para la UI global
+import { ref } from 'vue'
+export const isServerWakingUp = ref(false)
+export const isSubscriptionInactive = ref(false)
 
-  if (body && typeof body === 'object' && !(body instanceof FormData)) {
-    config.body = JSON.stringify(body)
-  }
+// Cola de refresco de token para evitar peticiones duplicadas
+let isRefreshing = false
+let failedQueue = []
 
-  const cleanBase = BASE_URL.replace(/\/$/, '')
-  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`
-  const url = `${cleanBase}${cleanEndpoint}`
-
-  try {
-    const response = await fetch(url, config)
-
-    // Manejo de respuestas sin contenido (204 No Content)
-    if (response.status === 204) {
-      return null
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error)
+    } else {
+      prom.resolve(token)
     }
-
-    const data = await response.json().catch(() => ({}))
-
-    if (!response.ok) {
-      const error = new Error(data.message || `Error HTTP ${response.status}: Petición no completada`)
-      error.status = response.status
-      error.data = data
-      throw error
-    }
-
-    return data
-  } catch (err) {
-    // Si ya es un error con status, lo relanzamos
-    if (err.status) {
-      throw err
-    }
-    // Error de red o conexión caída
-    const networkError = new Error('No fue posible conectar con el servidor. Verifique su conexión a internet.')
-    networkError.original = err
-    throw networkError
-  }
+  })
+  failedQueue = []
 }
 
-export const api = {
-  get: (endpoint, options) => apiClient(endpoint, { ...options, method: 'GET' }),
-  post: (endpoint, body, options) => apiClient(endpoint, { ...options, method: 'POST', body }),
-  put: (endpoint, body, options) => apiClient(endpoint, { ...options, method: 'PUT', body }),
-  patch: (endpoint, body, options) => apiClient(endpoint, { ...options, method: 'PATCH', body }),
-  delete: (endpoint, options) => apiClient(endpoint, { ...options, method: 'DELETE' }),
-}
+// Interceptor de Petición: adjunta el JWT access token
+apiClient.interceptors.request.use(
+  (config) => {
+    try {
+      const token = localStorage.getItem('hengest_access_token')
+      if (token && !config.headers.Authorization) {
+        config.headers.Authorization = `Bearer ${token}`
+      }
+    } catch {
+      // Ignorar error de localStorage
+    }
+    return config
+  },
+  (error) => Promise.reject(error)
+)
+
+// Interceptor de Respuesta: 401 (refresh), 402 (suscripción inactiva), cold-start
+apiClient.interceptors.response.use(
+  (response) => {
+    // Si la petición tuvo éxito, el servidor está despierto
+    isServerWakingUp.value = false
+    return response
+  },
+  async (error) => {
+    const originalRequest = error.config
+
+    // Detección de arranque en frío o error de conexión
+    if (
+      !error.response ||
+      error.code === 'ECONNABORTED' ||
+      error.message?.includes('Network Error') ||
+      (error.response?.status >= 500 && error.response?.status <= 504)
+    ) {
+      isServerWakingUp.value = true
+    } else {
+      isServerWakingUp.value = false
+    }
+
+    // 402: Suscripción inactiva
+    if (error.response?.status === 402 || error.response?.data?.code === 'suscripcion_inactiva') {
+      isSubscriptionInactive.value = true
+    }
+
+    // 401: Token inválido o expirado -> Intentar refrescar
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      // Si la petición era hacia el login o refresh, no reintentamos
+      if (originalRequest.url?.includes('/auth/login/') || originalRequest.url?.includes('/auth/refresh/')) {
+        return Promise.reject(error)
+      }
+
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject })
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`
+            return apiClient(originalRequest)
+          })
+          .catch((err) => Promise.reject(err))
+      }
+
+      originalRequest._retry = true
+      isRefreshing = true
+
+      try {
+        const refreshToken = localStorage.getItem('hengest_refresh_token')
+        if (!refreshToken) {
+          throw new Error('No refresh token available')
+        }
+
+        const res = await axios.post(`${API_BASE_URL}/auth/refresh/`, {
+          refresh: refreshToken,
+        })
+
+        const newAccess = res.data.access
+        localStorage.setItem('hengest_access_token', newAccess)
+
+        apiClient.defaults.headers.common.Authorization = `Bearer ${newAccess}`
+        originalRequest.headers.Authorization = `Bearer ${newAccess}`
+
+        processQueue(null, newAccess)
+        return apiClient(originalRequest)
+      } catch (refreshErr) {
+        processQueue(refreshErr, null)
+        try {
+          localStorage.removeItem('hengest_access_token')
+          localStorage.removeItem('hengest_refresh_token')
+          localStorage.removeItem('hengest_user')
+        } catch {}
+        // Redirigir a login si estamos en el navegador
+        if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
+          window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`
+        }
+        return Promise.reject(refreshErr)
+      } finally {
+        isRefreshing = false
+      }
+    }
+
+    return Promise.reject(error)
+  }
+)
 
 export default apiClient
-
